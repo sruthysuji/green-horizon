@@ -328,31 +328,28 @@
         </div>
     </div>
 </div>
-
 <script>
-    function proceed() {
-        const options = document.getElementsByName('agriculture');
-        let selectedOption = null;
-        for (const option of options) {
-            if (option.checked) {
-                selectedOption = option.value;
-                break;
-            }
-        }
-        if (selectedOption) {
-            const url = selectedOption === 'garden' ? 'file:page 2 for gaden.html' : 'file:page 4 terrace.html';
-            window.open(url, '_blank');
-        } else {
-            alert('Please select an option before proceeding.');
+function proceed() {
+    const options = document.getElementsByName('agriculture');
+    let selectedOption = null;
+    for (const option of options) {
+        if (option.checked) {
+            selectedOption = option.value;
+            break;
         }
     }
-    
-    function scrollToLastSection() {
-        const lastSection = document.getElementById('last-section');
-        lastSection.scrollIntoView({ behavior: 'smooth' });
+    if (selectedOption) {
+        const url = selectedOption === 'garden' ? 'page2forgarden.html' : 'page4terrace.html';
+        window.open(url, '_blank');
+    } else {
+        alert('Please select an option before proceeding.');
     }
+}
 
-
+function scrollToLastSection() {
+    const lastSection = document.getElementById('last-section');
+    lastSection.scrollIntoView({ behavior: 'smooth' });
+}
 </script>
 
 </body>
