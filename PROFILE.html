@@ -231,6 +231,7 @@
     <div id="camera-popup">
         <div id="camera-container">
             <video id="camera" width="300" height="300" autoplay></video>
+            <select id="camera-select" class="form-control mt-3"></select>
             <button id="capture-btn" class="btn btn-primary mt-3">Capture</button>
         </div>
     </div>
@@ -349,18 +350,46 @@
                 const cameraPopup = document.getElementById('camera-popup');
                 const video = document.getElementById('camera');
                 const captureBtn = document.getElementById('capture-btn');
-    
+                const cameraSelect = document.getElementById('camera-select');
                 cameraPopup.style.display = 'block';
+
+                // Clear existing options
+                cameraSelect.innerHTML = '';
     
-                // Use the getUserMedia API to access the camera
-                navigator.mediaDevices.getUserMedia({ video: true })
-                    .then((stream) => {
-                        video.srcObject = stream;
-                        video.play();
-                    })
-                    .catch((err) => {
-                        console.error('Error accessing the camera: ', err);
+                navigator.mediaDevices.enumerateDevices().then(devices => {
+                    const videoDevices = devices.filter(device => device.kind === 'videoinput');
+                    videoDevices.forEach((device, i) => {
+                        const option = document.createElement('option');
+                        option.value = device.deviceId;
+                        option.text = device.label || `Camera ${i + 1}`;
+                        cameraSelect.appendChild(option);
                     });
+                });
+
+                cameraSelect.addEventListener('change', () => {
+                    const selectedDeviceId = cameraSelect.value;
+                    startCamera(selectedDeviceId);
+                });
+    
+                // Start the camera with the selected device
+                function startCamera(deviceId) {
+                    const constraints = {
+                        video: {
+                            deviceId: deviceId ? { exact: deviceId } : undefined
+                        }
+                    };
+                    navigator.mediaDevices.getUserMedia(constraints)
+                        .then((stream) => {
+                            video.srcObject = stream;
+                            video.play();
+                        })
+                        .catch((err) => {
+                            console.error('Error accessing the camera: ', err);
+                        });
+                }
+    
+                // Start with the first available device
+                startCamera(cameraSelect.value);
     
                 // Capture button functionality
                 captureBtn.addEventListener('click', () => {
