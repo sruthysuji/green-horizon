@@ -131,6 +131,40 @@
                 transform: translateY(0);
             }
         }
+        #notification-modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgb(0, 0, 0);
+            background-color: rgba(0, 0, 0, 0.4);
+            padding-top: 60px;
+        }
+
+        #modal-content {
+            background-color: #fefefe;
+            margin: 5% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 300px;
+            text-align: center;
+        }
+
+        #modal-content h2 {
+            margin-top: 0;
+        }
+
+        #modal-content button {
+            margin: 5px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
@@ -267,9 +301,16 @@
              <h2>Keep Learning !!<br></h2>
             <h2>Starting your gardening journey with these tips can help ensure a successful and enjoyable experience. Happy gardening!</h2></p>
     </div>
-    <br><button onclick="openChatGPT()">Get Plant Info from ChatGPT</button>
+    <br><button onclick="openChatGPT()">Know more about Plants</button>
     </div>
-
+    <div id="notification-modal">
+        <div id="modal-content">
+            <h2>Stay Updated!</h2>
+            <p>We would love to send you notifications about plant care tips, new plant-based recipes, and special promotions. Would you like to receive these notifications?</p>
+            <button id="allow-notifications">Yes, Please!</button>
+            <button id="deny-notifications">No, Thanks</button>
+        </div>
+    </div>
     <div class="contacts" id="last-section">
         <h2>Contact Information</h2>
         <p>Phone: 123-456-7890</p>
@@ -317,7 +358,91 @@
     // Redirect to ChatGPT page or any other action you want
     // Example:
     window.open('https://chatgpt.com', '_blank');
-    }
+    }
+document.addEventListener('DOMContentLoaded', () => {
+            const modal = document.getElementById('notification-modal');
+            modal.style.display = 'block';
+            console.log('Modal displayed.');
+
+            document.getElementById('allow-notifications').addEventListener('click', () => {
+                console.log('Allow button clicked.');
+                requestNotificationPermission();
+                modal.style.display = 'none';
+            });
+
+            document.getElementById('deny-notifications').addEventListener('click', () => {
+                console.log('Deny button clicked.');
+                modal.style.display = 'none';
+            });
+        });
+
+        function requestNotificationPermission() {
+           
+            console.log('Requesting notification permission...');
+            if ('Notification' in window) {
+                Notification.requestPermission().then(permission => {
+                    console.log('Permission status:', permission);
+                    if (permission === 'granted') {
+                        console.log('Notification permission granted.');
+                        scheduleNotifications();
+                    } else {
+                        console.log('Notification permission denied.');
+                    }
+                }).catch(error => {
+                    console.error('Permission request error:', error);
+                });
+            } else {
+                console.log('This browser does not support notifications.');
+            }
+        }
+
+        function showNotification(title, body) {
+ 
+            console.log('Attempting to show notification:', title, body);
+            const options = {
+                body: body,
+                icon: 'https://via.placeholder.com/128',
+                badge: 'https://via.placeholder.com/64'
+            };
+            try {
+                const notification = new Notification(title, options);
+                notification.onerror = (event) => {
+                    console.error('Notification error:', event);
+                };
+            } catch (error) {
+                console.error('Notification creation error:', error);
+            }
+        }
+
+        function scheduleNotifications() {
+            const notificationTimes = [
+                { hour: 9, minute: 0, message: "Good morning! Time to water your plants! 🌱" },
+                { hour: 15, minute: 0, message: "Afternoon reminder: Give your plants some love and water them! 🌿" },
+                { hour: 21, minute: 0, message: "Evening tip: Water your plants before bed for a great start tomorrow! 🌵" },
+                { hour: 11, minute: 0, message: "Remember, plants bring joy and freshness to your life! 🌸" },
+                { hour: 17, minute: 0, message: "Keep going, your plants are thriving because of you! 🌼" },
+                { hour: 19, minute: 0, message: "Growing plants is a journey. Enjoy every moment! 🌻" }
+            ];
+
+            const now = new Date();
+
+            notificationTimes.forEach(notification => {
+                const targetTime = new Date();
+                targetTime.setHours(notification.hour, notification.minute, 0, 0);
+
+                if (targetTime < now) {
+                    targetTime.setDate(targetTime.getDate() + 1); // schedule for next day if time has already passed today
+                }
+
+                const delay = targetTime - now;
+                console.log(Scheduling notification: "${notification.message}" at ${targetTime} (in ${delay} ms));
+
+                setTimeout(() => {
+                    showNotification("Plant Care Reminder", notification.message);
+                }, delay);
+            });
+        }
+
 </script>
 
 </body>
